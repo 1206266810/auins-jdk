@@ -10,7 +10,7 @@ Installing Java Development Kit (JDK) on Ubuntu without using a third-party repo
 
 ## Features
 - `wget`-based downloader 
-- package handling
+- parchive (tarball) handling
 - automatic `/etc/environment` configuration
 - uses only standard Python modules
 
