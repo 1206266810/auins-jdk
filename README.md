@@ -35,9 +35,9 @@ NOTE: Everything listed here is already included in a standard Ubuntu installati
 Place your downloaded JDK package (in tarball) in the same directory with the program.
 
 
-### Additional notes
+## Additional notes
 - For safety, a backup named `environment.bak` for `/etc/environment` is created before it is modified.
 - This has been used and tested on Ubuntu 16.04. It is recommended to use this on a system
 without any previous attempts in JDK installation (i.e. newly-installed OS.) Doing so ensures that the
 `/etc/environment` file is not yet heavily modified and the directories/files that will be moved to `/usr/lib`
-will not conflict with any JDK related-files created prior to usage.
+would not conflict with any JDK related-files created prior to usage.
