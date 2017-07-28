@@ -19,6 +19,8 @@ Installing and updating Java Development Kit (JDK) on Ubuntu without using a thi
 #### Path
 `<path_to_file>`: Location of the JDK tarball
 
+[Download JDK here.](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
 ### Example:
 `$ sudo python3 auins-jdk.py --install "jdk-8u141-linux-x64.tar.gz"`
 
