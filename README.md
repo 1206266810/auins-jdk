@@ -13,6 +13,7 @@ Installing and updating Java Development Kit (JDK) on Ubuntu without using a thi
 
 ### Modes
 `--install`: Install JDK for the first time
+
 `--update`: Update previously installed JDK
 
 `<path_to_file>`: Location of the JDK tarball
