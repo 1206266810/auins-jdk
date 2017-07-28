@@ -11,11 +11,12 @@ Installing and updating Java Development Kit (JDK) on Ubuntu without using a thi
 ## Usage
 `$ sudo python3 auins-jdk.py <mode> "<path_to_file>"`
 
-### Modes
+#### Modes
 `--install`: Install JDK for the first time
 
 `--update`: Update previously installed JDK
 
+#### Path
 `<path_to_file>`: Location of the JDK tarball
 
 ### Example:
