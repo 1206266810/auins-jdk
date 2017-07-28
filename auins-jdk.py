@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-import os, tarfile, shutil, fileinput
+import sys, os, tarfile, shutil, fileinput
 
-# auins-jdk (c) saojeda (saojeda.github.com)
+# auins-jdk (c) saojeda (github.com/saojeda)
 # Licensed under MIT license
 
 splash = '''
@@ -11,82 +11,57 @@ splash = '''
  | (_| | |_| | | | | \__ \_____| | (_| |   < 
   \__,_|\__,_|_|_| |_|___/    _/ |\__,_|_|\_\\
                              |__/            
-
 '''
 print(splash)
 
-# URL validation heuristics
-def eval_link(link):
-	if "download.oracle.com" and ".tar.gz" in link: return True
-	else: return False
+if not (sys.argv[1] == "--install" or sys.argv[1] == "--update"): 
+    print("- ERROR: No valid installation mode specified!")
+    quit()
 
-# Error handling
-def force_term(num):
-	emsg = {
-		1 : "Download",
-		2 : "File access"	
-	}
-	print(esmg[num] + " error. Terminated.")
-	exit()
+# Access and extract tarball
+try: tar = tarfile.open(sys.argv[2])
+except:
+    print("- ERROR: Failed to access \"{}\"!".format(sys.argv[2]))
+    quit()
 
-print("Choose installation type: \n[1] Online \n[2] Offline")
-
-resp = int(input("Enter response: "))
-while resp != 1 and resp != 2:
-	resp = int(input("Enter response: "))
-
-if resp == 1:
-	rlink = input("Enter JDK download link: ")
-	while not eval_link(rlink): rlink = input("Enter JDK download link: ")
-	
-	# Extract filename from link
-	i = 0
-	for x in reversed(rlink): # Start from the last element
-		if x == "/": break # Find the first occurence of "/" (indicates end of filename block)
-		i -= 1 # Count position
-
-	filename = rlink[i:] # Slice string starting from the obtained position	
-
-	# Prepare wget arguments
-	wget_args = "wget -c --header \"Cookie: oraclelicense=accept-securebackup-cookie\" " + rlink
-	# Execute wget and check wget's exit code: terminate program if not successful, continue otherwise
-	if os.system(wget_args) != 0: force_term(1)
-else:	
-	filename = input("Enter file name: ")
-	while not ".tar.gz" in filename: filename = input("Enter file name: ")	
-
-# Access tarball
-try: tar = tarfile.open(filename)
-except: force_term(2)
-
-tar.extractall() # Extract contents
+print("+ Extracting \"{}\"...".format(sys.argv[2]))
+tar.extractall()  
 extfname = tar.getnames() # Obtain directory names (stored in a list)
 tar.close()	
 
-# Move contents to /usr/lib directory
 java_home = "/usr/lib/jvm/oracle-java-8"
-shutil.move(extfname[0], java_home) # extfname[0] accesses the root folder of the tarball
 
-# Create a backup first and then iterate throughout the environment file
-first = True
-envpath = "/etc/environment"
-for line in fileinput.FileInput(envpath, inplace=True, backup=".bak"):
-	if first: 
-		print(line[:-2] + ":" + java_home + "/bin\"")  # Alter first line only
-		first = False
-	else: print(line, end="")
+# If in update mode, remove existing java directory 
+if sys.argv[1] == "--update":
+    print("+ Removing \"{}\"...".format(java_home))
+    shutil.rmtree(java_home, ignore_errors=True)
 
-# Access environment file for appending
-try: pfile = open(envpath, "a")
-except: force_term(2)
+# Move contents to /usr/lib directory
+print("+ Moving \"{}\" to \"{}\"...".format(extfname[0],java_home))
+shutil.move(extfname[0],java_home) # extfname[0] accesses the root folder of the tarball
 
-# Append additional variables
-pfile.write("JAVA_HOME=" + java_home + "\n")
-pfile.write("JRE_HOME=" + java_home + "/jre" + "\n")
-pfile.close()
+# If in install mode, add environment variables to /etc/environment
+#Create a backup first and then iterate throughout the environment file
+if sys.argv[1] == "--install":
+    envpath = "/etc/environment"
+    print("+ Creating backup \"{}.bak\"...".format(envpath))
+    print("+ Appending environment variables to \"{}\"...".format(envpath)) 
+    first = True
+    for line in fileinput.FileInput(envpath, inplace=True, backup=".bak"):
+	    if first:
+                    print("{}:{}/bin\"".format(line[:-2],java_home)) # Modify first line only
+                    first = False
+	    else: print(line, end="")
 
-# Cleanup
-os.remove(filename)
+    # Access environment file for appending
+    envf = open(envpath, "a")
 
-print("Installation successful!")
-print("NOTE: Please log out/reboot for changes to apply.")
+    # Append additional variables
+    envf.write("JAVA_HOME=\"{}\"\n".format(java_home))
+    envf.write("JRE_HOME=\"{}/jre\"\n".format(java_home))
+    envf.close()
+    print("+ Installation successful!")
+else:
+    print("+ Update successful!")
+
+print("+ NOTE: Please log out/reboot for changes to apply.")
