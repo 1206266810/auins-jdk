@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, tarfile, shutil, fileinput
+import sys, tarfile, shutil, fileinput
 
 # auins-jdk (c) saojeda (github.com/saojeda)
 # Licensed under MIT license
